@@ -1,59 +1,84 @@
 package com.csse3200.game.components.player;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doReturn;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 import com.csse3200.game.areas.TestGameArea;
 import com.csse3200.game.areas.terrain.GameMap;
-import com.csse3200.game.areas.terrain.TerrainComponent;
-import com.csse3200.game.areas.terrain.TerrainFactory;
-import com.csse3200.game.components.CameraComponent;
-import com.csse3200.game.services.ResourceService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import com.csse3200.game.components.inventory.InventoryDisplayManager;
-import com.csse3200.game.services.ResourceService;
-import com.csse3200.game.services.sound.EffectSoundFile;
-import com.csse3200.game.services.sound.InvalidSoundFileException;
-import com.csse3200.game.services.sound.SoundFile;
-import com.csse3200.game.services.sound.SoundService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import com.csse3200.game.components.items.ItemComponent;
 import com.csse3200.game.components.items.ItemType;
 import com.csse3200.game.entities.Entity;
 import com.csse3200.game.extensions.GameExtension;
 import com.csse3200.game.input.InputService;
+import com.csse3200.game.services.ResourceService;
 import com.csse3200.game.services.ServiceLocator;
+import com.csse3200.game.services.sound.EffectSoundFile;
+import com.csse3200.game.services.sound.InvalidSoundFileException;
+import com.csse3200.game.services.sound.SoundFile;
+import com.csse3200.game.services.sound.SoundService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(GameExtension.class)
 class InventoryHotkeyTest {
+	private static final Logger logger = LoggerFactory.getLogger(InventoryHotkeyTest.class);
+	//TestGameArea to register so GameMap can be accessed through the ServiceLocator
+	private static final TestGameArea gameArea = new TestGameArea();
+	String[] texturePaths = {"images/tool_shovel.png"};
 	private Entity player;
 	private InventoryComponent inventoryComponent;
 	private PlayerActions playerActions;
 	private KeyboardPlayerInputComponent keyboardPlayerInputComponent;
-	private static final Logger logger = LoggerFactory.getLogger(InventoryHotkeyTest.class);
-	String[] texturePaths = {"images/tool_shovel.png"};
-	//TestGameArea to register so GameMap can be accessed through the ServiceLocator
-	private static final TestGameArea gameArea = new TestGameArea();
 
 	// Necessary for the playerActions component
 	@BeforeAll
 	static void setupGameAreaAndMap() {
 		GameMap gameMap = mock(GameMap.class);
 		gameArea.setGameMap(gameMap);
+	}
+
+	private static Stream<Arguments> checkHotkeySelectionTriggerParams() {
+		return Stream.of(
+				arguments(0, "Hoe"),
+				arguments(1, "Hoe1"),
+				arguments(2, "Hoe2"),
+				arguments(3, "Hoe3"),
+				arguments(4, "Hoe4"),
+				arguments(5, "Hoe5"),
+				arguments(6, "Hoe6"),
+				arguments(7, "Hoe7"),
+				arguments(8, "Hoe8"),
+				arguments(9, "Hoe9")
+		);
+	}
+
+	private static Stream<Arguments> checkKeyboardInputHotkeyParams() {
+		return Stream.of(
+
+				arguments(8),
+				arguments(9),
+				arguments(10),
+				arguments(11),
+				arguments(12),
+				arguments(13),
+				arguments(14),
+				arguments(15),
+				arguments(16),
+				arguments(7)
+
+		);
 	}
 
 	@BeforeEach
@@ -100,21 +125,6 @@ class InventoryHotkeyTest {
 		assertEquals(inventoryComponent.getHeldItem().getComponent(ItemComponent.class).getItemName(), expectedItemName);
 	}
 
-	private static Stream<Arguments> checkHotkeySelectionTriggerParams() {
-		return Stream.of(
-				arguments(0, "Hoe"),
-				arguments(1, "Hoe1"),
-				arguments(2, "Hoe2"),
-				arguments(3, "Hoe3"),
-				arguments(4, "Hoe4"),
-				arguments(5, "Hoe5"),
-				arguments(6, "Hoe6"),
-				arguments(7, "Hoe7"),
-				arguments(8, "Hoe8"),
-				arguments(9, "Hoe9")
-		);
-	}
-
 	@ParameterizedTest
 	@MethodSource({"checkKeyboardInputHotkeyParams"})
 	void checkKeyboardInputHotkey(int num) {
@@ -124,23 +134,6 @@ class InventoryHotkeyTest {
 		verify(inventoryComponent).setHeldItem(num - 8 >= 0 ? num - 8 : 9);
 		verify(playerActions).hotkeySelection(num - 8 >= 0 ? num - 8 : 9);
 		assertEquals(inventoryComponent.getHeldIndex(), num - 8 >= 0 ? num - 8 : 9);
-	}
-
-	private static Stream<Arguments> checkKeyboardInputHotkeyParams() {
-		return Stream.of(
-
-				arguments(8),
-				arguments(9),
-				arguments(10),
-				arguments(11),
-				arguments(12),
-				arguments(13),
-				arguments(14),
-				arguments(15),
-				arguments(16),
-				arguments(7)
-
-		);
 	}
 
 	@AfterEach

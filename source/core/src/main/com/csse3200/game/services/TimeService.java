@@ -9,20 +9,15 @@ public class TimeService {
 	private static final int MS_IN_MINUTE = 500;
 	private static final int MORNING_HOUR = 6;
 	private static final int NIGHT_HOUR = 20;
-
+	private static final String DAY_UPDATE = "dayUpdate";
+	private static final String MINUTE_UPDATE = "minuteUpdate";
+	private static final String HOUR_UPDATE = "hourUpdate";
+	private final EventHandler events;
 	private int minute;
 	private int hour;
 	private int day;
-
 	private long timeBuffer;
 	private boolean paused;
-	private final EventHandler events;
-
-	private static final String DAY_UPDATE = "dayUpdate";
-
-	private static final String MINUTE_UPDATE = "minuteUpdate";
-
-	private static final String HOUR_UPDATE = "hourUpdate";
 
 
 	/**
@@ -66,6 +61,22 @@ public class TimeService {
 	}
 
 	/**
+	 * Sets the in-game hour to a certain value. Also updates the time buffer and triggers any necessary events
+	 *
+	 * @param hour in-game hour
+	 */
+	public void setHour(int hour) {
+		if (hour < 0 || hour > 23) {
+			logger.warn("Incorrect hour value given: {}", hour);
+			return;
+		}
+		logger.debug("Hour is being set to: {}", this.hour);
+		this.hour = hour;
+		this.timeBuffer = 0;
+		events.trigger(HOUR_UPDATE);
+	}
+
+	/**
 	 * Gets the current in-game day
 	 *
 	 * @return in-game day
@@ -84,21 +95,28 @@ public class TimeService {
 	}
 
 	/**
+	 * Sets the in-game minute to a certain value. Also updates the time buffer and triggers any necessary events
+	 *
+	 * @param minute in-game minute
+	 */
+	public void setMinute(int minute) {
+		if (minute < 0 || minute > 59) {
+			logger.warn("Incorrect minute value given: {}", minute);
+			return;
+		}
+		logger.debug("Minute is being set to: {}", this.minute);
+		this.minute = minute;
+		this.timeBuffer = 0;
+		events.trigger(MINUTE_UPDATE);
+	}
+
+	/**
 	 * Determines whether it is day or not
 	 *
 	 * @return whether it is day or not
 	 */
 	public boolean isDay() {
 		return (hour >= MORNING_HOUR) && (hour < NIGHT_HOUR);
-	}
-
-	/**
-	 * Determines whether it is night or not
-	 *
-	 * @return whether it is night or not
-	 */
-	public boolean isNight() {
-		return !isDay();
 	}
 
 	/**
@@ -118,35 +136,12 @@ public class TimeService {
 	}
 
 	/**
-	 * Sets the in-game hour to a certain value. Also updates the time buffer and triggers any necessary events
+	 * Determines whether it is night or not
 	 *
-	 * @param hour in-game hour
+	 * @return whether it is night or not
 	 */
-	public void setHour(int hour) {
-		if (hour < 0 || hour > 23) {
-			logger.warn("Incorrect hour value given: {}", hour);
-			return;
-		}
-		logger.debug("Hour is being set to: {}", this.hour);
-		this.hour = hour;
-		this.timeBuffer = 0;
-		events.trigger(HOUR_UPDATE);
-	}
-
-	/**
-	 * Sets the in-game minute to a certain value. Also updates the time buffer and triggers any necessary events
-	 *
-	 * @param minute in-game minute
-	 */
-	public void setMinute(int minute) {
-		if (minute < 0 || minute > 59) {
-			logger.warn("Incorrect minute value given: {}", minute);
-			return;
-		}
-		logger.debug("Minute is being set to: {}", this.minute);
-		this.minute = minute;
-		this.timeBuffer = 0;
-		events.trigger(MINUTE_UPDATE);
+	public boolean isNight() {
+		return !isDay();
 	}
 
 	/**

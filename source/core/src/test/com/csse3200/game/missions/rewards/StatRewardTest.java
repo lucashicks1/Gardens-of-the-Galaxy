@@ -1,97 +1,95 @@
 package com.csse3200.game.missions.rewards;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.csse3200.game.areas.GameArea;
 import com.csse3200.game.areas.terrain.GameMap;
 import com.csse3200.game.areas.weather.ClimateController;
 import com.csse3200.game.components.combat.CombatStatsComponent;
 import com.csse3200.game.entities.Entity;
 import com.csse3200.game.services.ServiceLocator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StatRewardTest {
 
-    private StatReward r1, r2, r3;
+	private StatReward r1, r2, r3;
 
-    private class TestGameArea extends GameArea {
-        Entity player = new Entity()
-                .addComponent(new CombatStatsComponent(100, 10)); // like real player
+	@BeforeEach
+	void beforeTest() {
+		ServiceLocator.registerGameArea(new TestGameArea());
 
-        @Override
-        public void create() {
-            // do nothing
-        }
+		r1 = new StatReward(0);
+		r2 = new StatReward(-200);
+		r3 = new StatReward(200);
+	}
 
-        @Override
-        public Entity getPlayer() {
-            return player;
-        }
+	@AfterEach
+	void afterTest() {
+		ServiceLocator.clear();
+	}
 
-        /**
-         * @return
-         */
-        @Override
-        public ClimateController getClimateController() {
-            return null;
-        }
+	@Test
+	void noHealthReward() {
+		CombatStatsComponent initialStats = ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class);
+		r1.collect();
+		initialStats.addHealth(0);
+		assertEquals(initialStats, ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class));
+		assertTrue(r1.isCollected());
+	}
 
-        @Override
-        public Entity getTractor() {
-            return null;
-        }
+	@Test
+	void negativeHealthReward() {
+		CombatStatsComponent initialStats = ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class);
+		r2.collect();
+		initialStats.addHealth(-200);
+		assertEquals(initialStats, ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class));
+		assertTrue(r2.isCollected());
 
-        @Override
-        public GameMap getMap() {
-            return null;
-        }
-    }
+	}
 
+	@Test
+	void positiveHealthReward() {
+		CombatStatsComponent initialStats = ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class);
+		r3.collect();
+		initialStats.addHealth(200);
+		assertEquals(initialStats, ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class));
+		assertTrue(r3.isCollected());
+	}
 
-    @BeforeEach
-    void beforeTest() {
-        ServiceLocator.registerGameArea(new TestGameArea());
+	private class TestGameArea extends GameArea {
+		Entity player = new Entity()
+				.addComponent(new CombatStatsComponent(100, 10)); // like real player
 
-        r1 = new StatReward(0);
-        r2 = new StatReward(-200);
-        r3 = new StatReward(200);
-    }
+		@Override
+		public void create() {
+			// do nothing
+		}
 
-    @AfterEach
-    void afterTest() {
-        ServiceLocator.clear();
-    }
+		@Override
+		public Entity getPlayer() {
+			return player;
+		}
 
-    @Test
-    void noHealthReward() {
-        CombatStatsComponent initialStats = ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class);
-        r1.collect();
-        initialStats.addHealth(0);
-        assertEquals(initialStats, ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class));
-        assertTrue(r1.isCollected());
-    }
+		/**
+		 * @return
+		 */
+		@Override
+		public ClimateController getClimateController() {
+			return null;
+		}
 
-    @Test
-    void negativeHealthReward() {
-        CombatStatsComponent initialStats = ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class);
-        r2.collect();
-        initialStats.addHealth(-200);
-        assertEquals(initialStats, ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class));
-        assertTrue(r2.isCollected());
+		@Override
+		public Entity getTractor() {
+			return null;
+		}
 
-    }
-
-    @Test
-    void positiveHealthReward() {
-        CombatStatsComponent initialStats = ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class);
-        r3.collect();
-        initialStats.addHealth(200);
-        assertEquals(initialStats, ServiceLocator.getGameArea().getPlayer().getComponent(CombatStatsComponent.class));
-        assertTrue(r3.isCollected());
-    }
+		@Override
+		public GameMap getMap() {
+			return null;
+		}
+	}
 
 }

@@ -1,31 +1,27 @@
 package com.csse3200.game.components;
 
+import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 import com.csse3200.game.services.ServiceLocator;
 
-import box2dLight.PointLight;
-
-public class AuraLightComponent extends Component{
-
-	/**
-	 * Point light from box2dlights that gets rendered by the ray handler
-	 */
-	private final PointLight light;
-
-	/**
-	 * State of the light (on/off)
-	 */
-	private boolean active;
+public class AuraLightComponent extends Component {
 
 	/**
 	 * Default light distance used if nothing is provided in the constructor
 	 */
 	private static final float DEFAULT_DISTANCE = 8f;
-
 	/**
 	 * Default light colour if nothing is provided in the constructor
 	 */
 	private static final Color DEFAULT_COLOR = Color.LIGHT_GRAY;
+	/**
+	 * Point light from box2dlights that gets rendered by the ray handler
+	 */
+	private final PointLight light;
+	/**
+	 * State of the light (on/off)
+	 */
+	private boolean active;
 
 	/**
 	 * Creates a AuraLightComponent which can be attached to an entity to enable it to produce light.
@@ -36,6 +32,7 @@ public class AuraLightComponent extends Component{
 
 	/**
 	 * Creates an AuraLightComponent which can be attached to an entity to enable it to produce light.
+	 *
 	 * @param distance distance/spread of the light
 	 */
 	public AuraLightComponent(float distance) {
@@ -44,8 +41,8 @@ public class AuraLightComponent extends Component{
 
 
 	/**
-	 *
 	 * Creates an AuraLightComponent which can be attached to an entity to enable it to produce light.
+	 *
 	 * @param color color of the light being created
 	 */
 	public AuraLightComponent(Color color) {
@@ -53,10 +50,10 @@ public class AuraLightComponent extends Component{
 	}
 
 	/**
-	 *
 	 * Creates an AuraLightComponent which can be attached to an entity to enable it to produce light.
+	 *
 	 * @param distance distance/spread of the light
-	 * @param color color of the light being created
+	 * @param color    color of the light being created
 	 */
 	public AuraLightComponent(float distance, Color color) {
 		light = new PointLight(ServiceLocator.getLightService().getRayHandler(), 25, color, distance, 0, 0);
@@ -80,6 +77,7 @@ public class AuraLightComponent extends Component{
 
 	/**
 	 * Sets the distance/spread of the light
+	 *
 	 * @param distance distance/spread of the light
 	 */
 	public void setDistance(float distance) {
@@ -88,6 +86,7 @@ public class AuraLightComponent extends Component{
 
 	/**
 	 * Sets the color of the light
+	 *
 	 * @param color light color
 	 */
 	public void setColor(Color color) {
@@ -104,6 +103,7 @@ public class AuraLightComponent extends Component{
 
 	/**
 	 * Determines whether the light is currently on
+	 *
 	 * @return state of the light (on/off)
 	 */
 	public boolean getActive() {

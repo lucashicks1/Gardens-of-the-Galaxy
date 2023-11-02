@@ -39,15 +39,15 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(GameExtension.class)
 class TamedFollowTaskTest {
+	//TestGameArea to register so GameMap can be accessed through the ServiceLocator
+	private static final TestGameArea gameArea = new TestGameArea();
+	String[] texturePaths = {"images/animals/egg.png"};
 	private TamableComponent tame;
 	private ItemComponent fooditem;
 	private Entity foodEntity;
 	private Entity target;
 	private InventoryComponent targetInventory;
 	private InventoryComponent targetInvSpy;
-	String[] texturePaths = {"images/animals/egg.png"};
-	//TestGameArea to register so GameMap can be accessed through the ServiceLocator
-	private static final TestGameArea gameArea = new TestGameArea();
 
 	@BeforeAll
 	static void setupGameAreaAndMap() {

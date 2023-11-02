@@ -1,119 +1,115 @@
 package com.csse3200.game.missions.rewards;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-
-import com.csse3200.game.entities.EntityService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.csse3200.game.areas.GameArea;
 import com.csse3200.game.areas.terrain.GameMap;
 import com.csse3200.game.areas.weather.ClimateController;
 import com.csse3200.game.components.player.InventoryComponent;
 import com.csse3200.game.entities.Entity;
+import com.csse3200.game.entities.EntityService;
 import com.csse3200.game.services.ServiceLocator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ItemRewardTest {
 
-    private Entity e1, e2, e3, e4;
-    private ArrayList<Entity> items1, items2, items3;
+	private Entity e1, e2, e3, e4;
+	private ArrayList<Entity> items1, items2, items3;
 
-    private ItemReward r1, r2, r3;
+	private ItemReward r1, r2, r3;
 
-    public class TestGameArea extends GameArea {
-        Entity player = new Entity()
-                .addComponent(new InventoryComponent(new ArrayList<Entity>()));
+	@BeforeEach
+	void beforeTest() {
+		ServiceLocator.registerGameArea(new TestGameArea());
+		ServiceLocator.registerEntityService(new EntityService());
 
-        @Override
-        public void create() {
-            // do nothing
-        }
+		// empty item list
+		items1 = new ArrayList<Entity>();
+		r1 = new ItemReward(items1);
 
-        @Override
-        public Entity getPlayer() {
-            return player;
-        }
+		// single item list
+		items2 = new ArrayList<Entity>();
+		e1 = new Entity();
+		items2.add(e1);
+		r2 = new ItemReward(items2);
 
-        @Override
-        public ClimateController getClimateController() {
-            return null;
-        }
+		// many item list
+		items3 = new ArrayList<Entity>();
+		e2 = new Entity();
+		e3 = new Entity();
+		e4 = new Entity();
+		items3.add(e2);
+		items3.add(e3);
+		items3.add(e4);
+		r3 = new ItemReward(items3);
+	}
 
-        @Override
-        public Entity getTractor() {
-            return null;
-        }
+	@AfterEach
+	void afterTest() {
+		ServiceLocator.clear();
+	}
 
-        @Override
-        public GameMap getMap() {
-            return null;
-        }
-    }
+	@Test
+	void testEmptyCollect() {
+		InventoryComponent initialPlayerInventory = ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class);
+		assertFalse(r1.isCollected());
+		r1.collect();
+		assertEquals(initialPlayerInventory, ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class));
+		assertTrue(r1.isCollected());
+	}
 
+	@Test
+	void testSingleCollect() {
+		InventoryComponent initialPlayerInventory = ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class);
+		r2.collect();
+		initialPlayerInventory.addItem(e1);
+		assertEquals(initialPlayerInventory, ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class));
+		assertTrue(r2.isCollected());
 
-    @BeforeEach
-    void beforeTest() {
-        ServiceLocator.registerGameArea(new TestGameArea());
-        ServiceLocator.registerEntityService(new EntityService());
+	}
 
-        // empty item list
-        items1 = new ArrayList<Entity>();
-        r1 = new ItemReward(items1);
+	@Test
+	void testManyCollect() {
+		InventoryComponent initialPlayerInventory = ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class);
+		r3.collect();
+		initialPlayerInventory.addItem(e2);
+		initialPlayerInventory.addItem(e3);
+		initialPlayerInventory.addItem((e4));
+		assertEquals(initialPlayerInventory, ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class));
+		assertTrue(r3.isCollected());
+	}
 
-        // single item list
-        items2 = new ArrayList<Entity>();
-        e1 = new Entity();
-        items2.add(e1);
-        r2 = new ItemReward(items2);
+	public class TestGameArea extends GameArea {
+		Entity player = new Entity()
+				.addComponent(new InventoryComponent(new ArrayList<Entity>()));
 
-        // many item list
-        items3 = new ArrayList<Entity>();
-        e2 = new Entity();
-        e3 = new Entity();
-        e4 = new Entity();
-        items3.add(e2);
-        items3.add(e3);
-        items3.add(e4);
-        r3 = new ItemReward(items3);
-    }
+		@Override
+		public void create() {
+			// do nothing
+		}
 
-    @AfterEach
-    void afterTest() {
-        ServiceLocator.clear();
-    }
+		@Override
+		public Entity getPlayer() {
+			return player;
+		}
 
-    @Test
-    void testEmptyCollect() {
-        InventoryComponent initialPlayerInventory = ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class);
-        assertFalse(r1.isCollected());
-        r1.collect();
-        assertEquals(initialPlayerInventory, ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class));
-        assertTrue(r1.isCollected());
-    }
+		@Override
+		public ClimateController getClimateController() {
+			return null;
+		}
 
-    @Test
-    void testSingleCollect() {
-        InventoryComponent initialPlayerInventory = ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class);
-        r2.collect();
-        initialPlayerInventory.addItem(e1);
-        assertEquals(initialPlayerInventory, ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class));
-        assertTrue(r2.isCollected());
+		@Override
+		public Entity getTractor() {
+			return null;
+		}
 
-    }
-
-    @Test
-    void testManyCollect() {
-        InventoryComponent initialPlayerInventory = ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class);
-        r3.collect();
-        initialPlayerInventory.addItem(e2);
-        initialPlayerInventory.addItem(e3);
-        initialPlayerInventory.addItem((e4));
-        assertEquals(initialPlayerInventory, ServiceLocator.getGameArea().getPlayer().getComponent(InventoryComponent.class));
-        assertTrue(r3.isCollected());
-    }
+		@Override
+		public GameMap getMap() {
+			return null;
+		}
+	}
 }

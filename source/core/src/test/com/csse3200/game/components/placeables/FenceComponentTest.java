@@ -1,16 +1,5 @@
 package com.csse3200.game.components.placeables;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -32,111 +21,120 @@ import com.csse3200.game.rendering.DynamicTextureRenderComponent;
 import com.csse3200.game.rendering.RenderService;
 import com.csse3200.game.services.ResourceService;
 import com.csse3200.game.services.ServiceLocator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(GameExtension.class)
 class FenceComponentTest {
 
-    private Entity f1;
-    private Entity g1;
+	private Entity f1;
+	private Entity g1;
 
-    public class TestGameArea extends GameArea {
-        @Override
-        public void create() {
-            // Don't do anything because I love this game engine :)
-        }
+	@BeforeEach
+	void beforeEach() {
+		ServiceLocator.registerPhysicsService(new PhysicsService());
+		//ServiceLocator.registerInputService(new InputService());
+		ServiceLocator.registerResourceService(new ResourceService());
+		ServiceLocator.registerEntityService(new EntityService());
+		ServiceLocator.registerRenderService(new RenderService());
+		ServiceLocator.registerGameArea(new TestGameArea());
 
-        /**
-         * @return
-         */
-        @Override
-        public Entity getPlayer() {
-            return null;
-        }
-        @Override
-        public ClimateController getClimateController() {
-            return null;
-        }
+		DynamicTextureRenderComponent dtrc = mock(DynamicTextureRenderComponent.class);
 
-        @Override
-        public Entity getTractor() {
-            return null;
-        }
+		f1 = new Entity(EntityType.FENCE)
+				.addComponent(new PhysicsComponent())
+				.addComponent(new HitboxComponent())
+				.addComponent(new ColliderComponent().setLayer(PhysicsLayer.OBSTACLE))
+				.addComponent(dtrc)
+				.addComponent(new FenceComponent(false));
+		g1 = new Entity(EntityType.GATE)
+				.addComponent(new PhysicsComponent().setBodyType(BodyDef.BodyType.StaticBody))
+				.addComponent(new HitboxComponent())
+				.addComponent(new ColliderComponent().setLayer(PhysicsLayer.OBSTACLE))
+				.addComponent(dtrc)
+				.addComponent(new FenceComponent(true));
 
-        @Override
-        public GameMap getMap() {
-            GameMap mockGameMap = mock(GameMap.class);
-            when(mockGameMap.getTile(any(Vector2.class))).thenReturn(new TerrainTile(null, TerrainCategory.GRASS));
-            return mockGameMap;
-        }
-    }
+		f1.create();
+		g1.create();
+	}
 
-    @BeforeEach
-    void beforeEach() {
-        ServiceLocator.registerPhysicsService(new PhysicsService());
-        //ServiceLocator.registerInputService(new InputService());
-        ServiceLocator.registerResourceService(new ResourceService());
-        ServiceLocator.registerEntityService(new EntityService());
-        ServiceLocator.registerRenderService(new RenderService());
-        ServiceLocator.registerGameArea(new TestGameArea());
+	@Test
+	void shouldCreateComponent() {
+		assertNotNull(f1.getComponent(FenceComponent.class));
+		assertNotNull(g1.getComponent(FenceComponent.class));
+	}
 
-        DynamicTextureRenderComponent dtrc = mock(DynamicTextureRenderComponent.class);
+	@Test
+	void shouldOpenGate() {
+		/* Pretend we open the gate */
+		g1.getEvents().trigger("interact");
+		Fixture fix = g1.getComponent(ColliderComponent.class).getFixture();
 
-        f1 = new Entity(EntityType.FENCE)
-                .addComponent(new PhysicsComponent())
-                .addComponent(new HitboxComponent())
-                .addComponent(new ColliderComponent().setLayer(PhysicsLayer.OBSTACLE))
-                .addComponent(dtrc)
-                .addComponent(new FenceComponent(false));
-        g1 = new Entity(EntityType.GATE)
-                .addComponent(new PhysicsComponent().setBodyType(BodyDef.BodyType.StaticBody))
-                .addComponent(new HitboxComponent())
-                .addComponent(new ColliderComponent().setLayer(PhysicsLayer.OBSTACLE))
-                .addComponent(dtrc)
-                .addComponent(new FenceComponent(true));
+		if (fix != null) {
+			assertTrue(fix.isSensor());
+			return;
+		}
+	}
 
-        f1.create();
-        g1.create();
-    }
+	@Test
+	void shouldCloseGate() {
+		/* Open and close gate */
+		g1.getEvents().trigger("interact");
+		g1.getEvents().trigger("interact");
+		Fixture fix = g1.getComponent(ColliderComponent.class).getFixture();
 
-    @Test
-    void shouldCreateComponent() {
-        assertNotNull(f1.getComponent(FenceComponent.class));
-        assertNotNull(g1.getComponent(FenceComponent.class));
-    }
+		if (fix != null) {
+			assertFalse(fix.isSensor());
+			return;
+		}
+	}
 
-    @Test
-    void shouldOpenGate() {
-        /* Pretend we open the gate */
-        g1.getEvents().trigger("interact");
-        Fixture fix = g1.getComponent(ColliderComponent.class).getFixture();
+	@Test
+	void shouldNotInteractFence() {
+		f1.getEvents().trigger("interact");
+		Fixture fix = f1.getComponent(ColliderComponent.class).getFixture();
 
-        if (fix != null) {
-            assertTrue(fix.isSensor());
-            return;
-        }
-    }
+		if (fix != null) {
+			assertFalse(fix.isSensor());
+			return;
+		}
+	}
 
-    @Test
-    void shouldCloseGate() {
-        /* Open and close gate */
-        g1.getEvents().trigger("interact");
-        g1.getEvents().trigger("interact");
-        Fixture fix = g1.getComponent(ColliderComponent.class).getFixture();
+	public class TestGameArea extends GameArea {
+		@Override
+		public void create() {
+			// Don't do anything because I love this game engine :)
+		}
 
-        if (fix != null) {
-            assertFalse(fix.isSensor());
-            return;
-        }
-    }
+		/**
+		 * @return
+		 */
+		@Override
+		public Entity getPlayer() {
+			return null;
+		}
 
-    @Test
-    void shouldNotInteractFence() {
-        f1.getEvents().trigger("interact");
-        Fixture fix = f1.getComponent(ColliderComponent.class).getFixture();
+		@Override
+		public ClimateController getClimateController() {
+			return null;
+		}
 
-        if (fix != null) {
-            assertFalse(fix.isSensor());
-            return;
-        }
-    }
+		@Override
+		public Entity getTractor() {
+			return null;
+		}
+
+		@Override
+		public GameMap getMap() {
+			GameMap mockGameMap = mock(GameMap.class);
+			when(mockGameMap.getTile(any(Vector2.class))).thenReturn(new TerrainTile(null, TerrainCategory.GRASS));
+			return mockGameMap;
+		}
+	}
 }

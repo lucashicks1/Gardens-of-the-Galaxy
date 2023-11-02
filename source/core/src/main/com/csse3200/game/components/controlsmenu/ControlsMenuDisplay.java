@@ -23,207 +23,201 @@ import java.util.ArrayList;
  * Control menu display and settings.
  */
 public class ControlsMenuDisplay extends UIComponent {
-  private static final Logger logger = LoggerFactory.getLogger(ControlsMenuDisplay.class);
-  private final GdxGame game;
+	private static final Logger logger = LoggerFactory.getLogger(ControlsMenuDisplay.class);
+	/**
+	 * The target fps at which the frames should be updated
+	 */
+	private static int fps = 15;
+	/**
+	 * The duration for which each frame should be displayed
+	 */
+	private static final long FRAME_DURATION = 800 / fps;
+	private final GdxGame game;
+	/**
+	 * The base Table on which the layout of the screen is built
+	 */
+	private Table rootTable;
+	/**
+	 * The Image that represents the background of the page
+	 */
+	private Image background;
+	/**
+	 * An Image that stores the current frame of the menu screen animation
+	 */
+	private Image transitionFrames;
+	/**
+	 * The current frame of the animation
+	 */
+	private int frame;
+	/**
+	 * The time at which the last frame was updated
+	 */
+	private long lastFrameTime;
 
-  /**
-   * The base Table on which the layout of the screen is built
-   */
-  private Table rootTable;
+	public ControlsMenuDisplay(GdxGame game) {
+		super();
+		// Initialise the animation with a blank image
+		transitionFrames = new Image();
+		this.game = game;
+	}
 
-  /**
-   * The Image that represents the background of the page
-   */
-  private Image background;
+	@Override
+	public void create() {
+		super.create();
+		// initialise to the first frame
+		frame = 1;
+		addActors();
+	}
 
-  /**
-   * An Image that stores the current frame of the menu screen animation
-   */
-  private Image transitionFrames;
+	/**
+	 * Add the UI widgets that form the menu to the stage
+	 */
+	private void addActors() {
+		TextButton returnBtn = new TextButton("Return", skin, "orange"); // Returns the user to the MainMenu Screen
 
-  /**
-   * The current frame of the animation
-   */
-  private int frame;
+		// Listen for a button press
+		returnBtn.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent changeEvent, Actor actor) {
+				logger.debug("Exit button clicked");
+				exitMenu();
+			}
+		});
 
-  /**
-   * The time at which the last frame was updated
-   */
-  private long lastFrameTime;
+		Actor controlsTbl = makeControlsTable(); // generate the table that represents the controls of the game
 
-  /**
-   * The target fps at which the frames should be updated
-   */
-  private static int fps = 15;
+		// Set the background image
+		// TODO: Make the background images smaller and use inbuilt animation and styling for the title so that spacing is easier to handle
+		background = new Image(
+				ServiceLocator.getResourceService().getAsset("images/galaxy_home_still.png", Texture.class));
+		background.setWidth(Gdx.graphics.getWidth());
+		background.setHeight(Gdx.graphics.getHeight());
+		background.setPosition(0, 0);
+		stage.addActor(background);
 
-  /**
-   * The duration for which each frame should be displayed
-   */
-  private static final long FRAME_DURATION = 800 / fps;
+		rootTable = new Table();
+		rootTable.setFillParent(true); // Make the root table fill the screen
 
-  public ControlsMenuDisplay(GdxGame game) {
-    super();
-    // Initialise the animation with a blank image
-    transitionFrames = new Image();
-    this.game = game;
-  }
+		rootTable.add(transitionFrames).padBottom(-50f);
 
-  @Override
-  public void create() {
-    super.create();
-    // initialise to the first frame
-    frame = 1;
-    addActors();
-  }
+		rootTable.row(); // Padding ensures that there is always space between table and title
 
-  /**
-   * Add the UI widgets that form the menu to the stage
-   */
-  private void addActors() {
-    TextButton returnBtn = new TextButton("Return", skin, "orange"); // Returns the user to the MainMenu Screen
+		rootTable.add(controlsTbl).expandX().padBottom(30f); // Add the controls table and let it take as much space as needed
+		rootTable.row().padBottom(50f); // Padding ensures that there is always space between table and exit button
 
-    // Listen for a button press
-    returnBtn.addListener(new ChangeListener() {
-      @Override
-      public void changed(ChangeEvent changeEvent, Actor actor) {
-        logger.debug("Exit button clicked");
-        exitMenu();
-      }
-    });
+		rootTable.add(returnBtn).padBottom(30f); // The return button is anchored to the bottom of the page
 
-    Actor controlsTbl = makeControlsTable(); // generate the table that represents the controls of the game
+		stage.addActor(rootTable); // Add the root table to the stage
+	}
 
-    // Set the background image
-    // TODO: Make the background images smaller and use inbuilt animation and styling for the title so that spacing is easier to handle
-    background = new Image(
-            ServiceLocator.getResourceService().getAsset("images/galaxy_home_still.png", Texture.class));
-    background.setWidth(Gdx.graphics.getWidth());
-    background.setHeight(Gdx.graphics.getHeight());
-    background.setPosition(0, 0);
-    stage.addActor(background);
+	/**
+	 * Update the frame of the background animation
+	 */
+	private void updateAnimation() {
+		if (frame < ControlsScreen.FRAME_COUNT) {
+			// set the next frame of the animation
+			transitionFrames.setDrawable(new TextureRegionDrawable(new TextureRegion(ServiceLocator.getResourceService()
+					.getAsset(ControlsScreen.getTransitionTextures()[frame], Texture.class))));
+			transitionFrames.setWidth(Gdx.graphics.getWidth());
+			transitionFrames.setHeight((float) Gdx.graphics.getHeight() / 2);
+			transitionFrames.setPosition(0, (float) Gdx.graphics.getHeight() / 2 + 15);
+			frame++;
+			lastFrameTime = System.currentTimeMillis();
+		} else {
+			frame = 1;
+		}
+	}
 
-    rootTable = new Table();
-    rootTable.setFillParent(true); // Make the root table fill the screen
+	/**
+	 * Helper method to construct the controls table and return it to be added to the root table
+	 *
+	 * @return controlsTable - A Table containing the game's controls and their descriptions
+	 */
+	private Actor makeControlsTable() {
+		Table controlsTbl = new Table();
 
-    rootTable.add(transitionFrames).padBottom(-50f);
+		// Make a scroll pane
+		ScrollPane scrollPane = new ScrollPane(controlsTbl);
+		// TODO: Update scrollpane style to have black labels
 
-    rootTable.row(); // Padding ensures that there is always space between table and title
+		// Set column default heights and widths
+		controlsTbl.defaults().minHeight(50f).padTop(20f);
+		controlsTbl.columnDefaults(0).minWidth(50f);
+		controlsTbl.columnDefaults(1).padLeft(50f);
 
-    rootTable.add(controlsTbl).expandX().padBottom(30f); // Add the controls table and let it take as much space as needed
-      rootTable.row().padBottom(50f); // Padding ensures that there is always space between table and exit button
+		// Add the header row
+		Label controlLabel = new Label("Key", skin, "large");
+		Label useLabel = new Label("Usage", skin, "large");
 
-    rootTable.add(returnBtn).padBottom(30f); // The return button is anchored to the bottom of the page
+		controlsTbl.add(controlLabel);
+		controlsTbl.add(useLabel).center();
 
-    stage.addActor(rootTable); // Add the root table to the stage
-  }
+		// Create a dictionary to store all the controls
+		// LinkedHashMap is the only map the preserves order of insertion.
+		// Performance is a non-issue in a static table, so using a linked list structure doesn't matter
+		ArrayList<Pair<String, String>> controls = new ArrayList<>();
 
-  /**
-   * Update the frame of the background animation
-   */
-  private void updateAnimation() {
-    if (frame < ControlsScreen.FRAME_COUNT) {
-      // set the next frame of the animation
-      transitionFrames.setDrawable(new TextureRegionDrawable(new TextureRegion(ServiceLocator.getResourceService()
-              .getAsset(ControlsScreen.getTransitionTextures()[frame], Texture.class))));
-      transitionFrames.setWidth(Gdx.graphics.getWidth());
-      transitionFrames.setHeight((float)Gdx.graphics.getHeight() / 2);
-      transitionFrames.setPosition(0, (float)Gdx.graphics.getHeight() / 2 + 15);
-      frame++;
-      lastFrameTime = System.currentTimeMillis();
-    } else {
-      frame = 1;
-    }
-  }
+		// To add another control, simply put it in the map below.
+		controls.add(new Pair<>("W", "Moves the character upwards"));
+		controls.add(new Pair<>("A", "Moves the character to the left"));
+		controls.add(new Pair<>("S", "Moves the character to the right"));
+		controls.add(new Pair<>("D", "Moves the character downwards"));
+		controls.add(new Pair<>("T", "Toggles the player light on and off"));
+		controls.add(new Pair<>("R", "Eat food items"));
+		controls.add(new Pair<>("Q", "Toggle Plant information display"));
+		controls.add(new Pair<>("Esc", "Toggles the pause game function"));
 
-  /**
-   * Helper method to construct the controls table and return it to be added to the root table
-   * @return controlsTable - A Table containing the game's controls and their descriptions
-   */
-  private Actor makeControlsTable() {
-    Table controlsTbl = new Table();
+		for (Pair<String, String> control : controls) {
+			// Start a new row for each control
+			controlsTbl.row();
+			// Create a button to represent the key press required
+			TextButton keyButton = new TextButton(control.getKey(), skin, "orange");
+			// Create a button to represent the control's description
+			Label descriptionLabel = new Label(control.getValue(), skin);
 
-    // Make a scroll pane
-      ScrollPane scrollPane = new ScrollPane(controlsTbl);
-      // TODO: Update scrollpane style to have black labels
+			// Add the buttons to the table
+			controlsTbl.add(keyButton).center();
+			controlsTbl.add(descriptionLabel).center();
+		}
 
-    // Set column default heights and widths
-    controlsTbl.defaults().minHeight(50f).padTop(20f);
-    controlsTbl.columnDefaults(0).minWidth(50f);
-    controlsTbl.columnDefaults(1).padLeft(50f);
+		return scrollPane;
+	}
 
-    // Add the header row
-    Label controlLabel = new Label("Key", skin, "large");
-    Label useLabel = new Label("Usage", skin, "large");
+	/**
+	 * Returns the user to the Main Menu screen
+	 */
+	private void exitMenu() {
+		game.setScreen(ScreenType.MAIN_MENU);
+	}
 
-    controlsTbl.add(controlLabel);
-    controlsTbl.add(useLabel).center();
+	@Override
+	protected void draw(SpriteBatch batch) {
+		// draw is handled by the stage
+	}
 
-    // Create a dictionary to store all the controls
-    // LinkedHashMap is the only map the preserves order of insertion.
-    // Performance is a non-issue in a static table, so using a linked list structure doesn't matter
-    ArrayList<Pair<String, String>> controls = new ArrayList<>();
+	@Override
+	public void update() {
+		// Update the animation frame if the time threshold has been hit
+		if (System.currentTimeMillis() - lastFrameTime > FRAME_DURATION) {
+			updateAnimation();
+		}
 
-    // To add another control, simply put it in the map below.
-    controls.add(new Pair<>("W", "Moves the character upwards"));
-    controls.add(new Pair<>("A", "Moves the character to the left"));
-    controls.add(new Pair<>("S", "Moves the character to the right"));
-    controls.add(new Pair<>("D", "Moves the character downwards"));
-    controls.add(new Pair<>("T", "Toggles the player light on and off"));
-    controls.add(new Pair<>("R", "Eat food items"));
-    controls.add(new Pair<>("Q", "Toggle Plant information display"));
-    controls.add(new Pair<>("Esc", "Toggles the pause game function"));
+		// Make sure the background image stays full screen even after screen resizes
+		if (background != null &&
+				(Gdx.graphics.getHeight() != background.getHeight()
+						|| Gdx.graphics.getWidth() != background.getWidth())) {
+			background.setWidth(Gdx.graphics.getWidth());
+			background.setHeight(Gdx.graphics.getHeight());
+			background.setPosition(0, 0);
+			logger.debug("Background resized");
+		}
 
-    for (Pair<String, String> control : controls) {
-      // Start a new row for each control
-      controlsTbl.row();
-      // Create a button to represent the key press required
-      TextButton keyButton = new TextButton(control.getKey(), skin, "orange");
-      // Create a button to represent the control's description
-      Label descriptionLabel = new Label(control.getValue(), skin);
+		stage.act(ServiceLocator.getTimeSource().getDeltaTime());
+	}
 
-      // Add the buttons to the table
-      controlsTbl.add(keyButton).center();
-      controlsTbl.add(descriptionLabel).center();
-    }
-
-    return scrollPane;
-  }
-
-  /**
-   * Returns the user to the Main Menu screen
-   */
-  private void exitMenu() {
-    game.setScreen(ScreenType.MAIN_MENU);
-  }
-
-  @Override
-  protected void draw(SpriteBatch batch) {
-    // draw is handled by the stage
-  }
-
-  @Override
-  public void update() {
-    // Update the animation frame if the time threshold has been hit
-    if (System.currentTimeMillis() - lastFrameTime > FRAME_DURATION) {
-      updateAnimation();
-    }
-
-    // Make sure the background image stays full screen even after screen resizes
-    if (background != null &&
-            (Gdx.graphics.getHeight() != background.getHeight()
-            || Gdx.graphics.getWidth() != background.getWidth())) {
-      background.setWidth(Gdx.graphics.getWidth());
-      background.setHeight(Gdx.graphics.getHeight());
-      background.setPosition(0, 0);
-      logger.debug("Background resized");
-    }
-
-    stage.act(ServiceLocator.getTimeSource().getDeltaTime());
-  }
-
-  @Override
-  public void dispose() {
-    rootTable.clear();
-    super.dispose();
-  }
+	@Override
+	public void dispose() {
+		rootTable.clear();
+		super.dispose();
+	}
 }

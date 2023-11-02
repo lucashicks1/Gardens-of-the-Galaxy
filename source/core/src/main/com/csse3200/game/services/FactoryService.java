@@ -13,10 +13,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FactoryService {
-	private FactoryService() {
-		throw new IllegalStateException("Util class");
-	}
-
 	private static final Map<EntityType, Supplier<Entity>> npcFactories = Map.ofEntries(
 			new AbstractMap.SimpleEntry<EntityType, Supplier<Entity>>(EntityType.CHICKEN, NPCFactory::createChicken),
 			new AbstractMap.SimpleEntry<EntityType, Supplier<Entity>>(EntityType.COW, NPCFactory::createCow),
@@ -27,7 +23,6 @@ public class FactoryService {
 			new AbstractMap.SimpleEntry<EntityType, Supplier<Entity>>(EntityType.BAT, NPCFactory::createBat),
 			new AbstractMap.SimpleEntry<EntityType, Supplier<Entity>>(EntityType.SHIP_DEBRIS, ShipDebrisFactory::createShipDebris),
 			new AbstractMap.SimpleEntry<EntityType, Supplier<Entity>>(EntityType.SHIP_EATER, NPCFactory::createShipEater));
-
 	private static final Map<String, Function<CropTileComponent, Entity>> plantFactories = Map.of(
 			"Cosmic Cob", PlantFactory::createCosmicCob,
 			"Aloe Vera", PlantFactory::createAloeVera,
@@ -37,7 +32,6 @@ public class FactoryService {
 			"Deadly Nightshade", PlantFactory::createDeadlyNightshade,
 			"Test", PlantFactory::createTest
 	);
-
 	private static final Map<String, Supplier<Entity>> itemFactories = Map.ofEntries(
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("shovel", ItemFactory::createShovel),
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("hoe", ItemFactory::createHoe),
@@ -91,7 +85,6 @@ public class FactoryService {
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("Churchill", ItemFactory::createChurchill),
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("GOLDEN_STATUE", ItemFactory::createGoldenFish)
 	);
-
 	private static final Map<String, Supplier<Entity>> placeableFactories = Map.ofEntries(
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("FENCE", PlaceableFactory::createFence),
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("GATE", PlaceableFactory::createGate),
@@ -100,7 +93,6 @@ public class FactoryService {
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("CHEST", PlaceableFactory::createChest),
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("LIGHT", PlaceableFactory::createLight),
 			new AbstractMap.SimpleEntry<String, Supplier<Entity>>("GOLDEN_STATUE", PlaceableFactory::createGoldenTrophy));
-
 	private static final Map<String, Supplier<Quest>> questFactories = Map.ofEntries(
 			new AbstractMap.SimpleEntry<String, Supplier<Quest>>(QuestFactory.FIRST_CONTACT_QUEST_NAME, QuestFactory::createFirstContactQuest),
 			new AbstractMap.SimpleEntry<String, Supplier<Quest>>(QuestFactory.CLEARING_YOUR_MESS_QUEST_NAME, QuestFactory::createClearingYourMessQuest),
@@ -134,6 +126,10 @@ public class FactoryService {
 			new AbstractMap.SimpleEntry<String, Supplier<Quest>>(QuestFactory.THE_THUNDERLORDS_BLESSING_QUEST_NAME, QuestFactory::createTheThunderlordsBlessingQuests),
 			new AbstractMap.SimpleEntry<String, Supplier<Quest>>(QuestFactory.ITS_COLD_OUTSIDE_QUEST_NAME, QuestFactory::createItsColdOutsideQuests),
 			new AbstractMap.SimpleEntry<String, Supplier<Quest>>(QuestFactory.ACID_RAIN_QUEST_NAME, QuestFactory::createAcidRainQuests));
+
+	private FactoryService() {
+		throw new IllegalStateException("Util class");
+	}
 
 	public static Map<String, Function<CropTileComponent, Entity>> getPlantFactories() {
 		return plantFactories;

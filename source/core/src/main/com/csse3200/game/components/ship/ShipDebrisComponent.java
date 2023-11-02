@@ -19,16 +19,8 @@ import static com.csse3200.game.missions.quests.QuestFactory.ALIENS_ATTACK_QUEST
  * Currently, triggers a DEBRIS_CLEARED event on the mission manager when destroyed.
  */
 public class ShipDebrisComponent extends Component {
-	Random random = new SecureRandom();
 	static boolean canSpawnShipEater = false;
-
-	@Override
-	public void create() {
-		super.create();
-
-		entity.getEvents().addListener("destroy", this::destroy);
-		ServiceLocator.getMissionManager().getEvents().addListener(MissionManager.MissionEvent.QUEST_REWARD_COLLECTED.name(), ShipDebrisComponent::checkCanSpawnShipEater);
-	}
+	Random random = new SecureRandom();
 
 	/**
 	 * Check if the player has completed the ALIENS_ATTACK_QUEST_NAME quest which gives
@@ -47,6 +39,14 @@ public class ShipDebrisComponent extends Component {
 	 */
 	public static void clearCanSpawnShipEater() {
 		canSpawnShipEater = false;
+	}
+
+	@Override
+	public void create() {
+		super.create();
+
+		entity.getEvents().addListener("destroy", this::destroy);
+		ServiceLocator.getMissionManager().getEvents().addListener(MissionManager.MissionEvent.QUEST_REWARD_COLLECTED.name(), ShipDebrisComponent::checkCanSpawnShipEater);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets.main.java.srcDirs = [ "src/main/" ]
-sourceSets.test.java.srcDirs = [ "src/test/" ]
+sourceSets.main.java.srcDirs = ["src/main/"]
+sourceSets.test.java.srcDirs = ["src/test/"]
 
 eclipse.project.name = appName + "-core"
 
@@ -20,7 +20,7 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
-		html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html')
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html')
     }
 }
 

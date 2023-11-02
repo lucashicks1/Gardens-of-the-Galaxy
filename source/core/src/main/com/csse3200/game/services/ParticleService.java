@@ -10,17 +10,18 @@ import com.csse3200.game.rendering.ParticleEffectWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ParticleService {
-	private static final Logger logger = LoggerFactory.getLogger(ParticleService.class);
-
 	public static final String WEATHER_EVENT = "WEATHER_EVENT";
 	public static final String ENTITY_EFFECT = "ENTITY_EFFECT";
 	public static final String START_EVENT = "startVisualEffect";
 	public static final String STOP_EVENT = "stopVisualEffect";
-
+	private static final Logger logger = LoggerFactory.getLogger(ParticleService.class);
 	/**
 	 * All the effects that will be rendered
 	 */
@@ -40,35 +41,6 @@ public class ParticleService {
 	 * Hashmap containing particle effect pools for each particle effect type.
 	 */
 	private final EnumMap<ParticleEffectType, ParticleEffectPool> particleEffectPools;
-
-	/**
-	 * Enum for each type of particle effect known to the particle system
-	 */
-	public enum ParticleEffectType {
-		RAIN(WEATHER_EVENT, "particle-effects/acidRain.p", 1, 10),
-		BLIZZARD(WEATHER_EVENT, "particle-effects/snowEffect.p", 1, 10),
-		SUCCESS_EFFECT(ENTITY_EFFECT, "particle-effects/successEffect.p", 1, 10),
-		TELEPORT_EFFECT(ENTITY_EFFECT, "particle-effects/teleportEffect.p", 1, 10),
-		ATTACK_EFFECT(ENTITY_EFFECT, "particle-effects/attackEffect.p", 1, 10),
-		FEED_EFFECT(ENTITY_EFFECT, "particle-effects/feedEffect.p", 1, 10),
-		DIRT_EFFECT(ENTITY_EFFECT, "particle-effects/dirtEffect.p", 1, 10);
-
-		private final String category;
-		private final String effectPath;
-		private final int minCapacity;
-		private final int maxCapacity;
-
-		ParticleEffectType(String category, String effectPath, int minCapacity, int maxCapacity) {
-			this.category = category;
-			this.effectPath = effectPath;
-			this.minCapacity = minCapacity;
-			this.maxCapacity = maxCapacity;
-		}
-
-		public String getCategory() {
-			return category;
-		}
-	}
 
 	/**
 	 * Creates a particle service, loading in all particle effect assets and creating pools for those particle effects.
@@ -229,5 +201,34 @@ public class ParticleService {
 	 */
 	public void removeComponent(ParticleEffectComponent component) {
 		effectComponents.remove(component);
+	}
+
+	/**
+	 * Enum for each type of particle effect known to the particle system
+	 */
+	public enum ParticleEffectType {
+		RAIN(WEATHER_EVENT, "particle-effects/acidRain.p", 1, 10),
+		BLIZZARD(WEATHER_EVENT, "particle-effects/snowEffect.p", 1, 10),
+		SUCCESS_EFFECT(ENTITY_EFFECT, "particle-effects/successEffect.p", 1, 10),
+		TELEPORT_EFFECT(ENTITY_EFFECT, "particle-effects/teleportEffect.p", 1, 10),
+		ATTACK_EFFECT(ENTITY_EFFECT, "particle-effects/attackEffect.p", 1, 10),
+		FEED_EFFECT(ENTITY_EFFECT, "particle-effects/feedEffect.p", 1, 10),
+		DIRT_EFFECT(ENTITY_EFFECT, "particle-effects/dirtEffect.p", 1, 10);
+
+		private final String category;
+		private final String effectPath;
+		private final int minCapacity;
+		private final int maxCapacity;
+
+		ParticleEffectType(String category, String effectPath, int minCapacity, int maxCapacity) {
+			this.category = category;
+			this.effectPath = effectPath;
+			this.minCapacity = minCapacity;
+			this.maxCapacity = maxCapacity;
+		}
+
+		public String getCategory() {
+			return category;
+		}
 	}
 }

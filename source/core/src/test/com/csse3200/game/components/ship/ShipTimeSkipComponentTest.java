@@ -25,6 +25,16 @@ import static org.mockito.Mockito.*;
 class ShipTimeSkipComponentTest {
 	private boolean isMorningHour;
 
+	private static Stream<Arguments> updatesTimeWhenUnlockedParams() {
+		return Stream.of(
+				// (initialDay, initialHour, initialMinute, expectedDay)
+				arguments(0, 5, 0, 0),
+				arguments(0, 5, 59, 0),
+				arguments(0, 6, 0, 1),
+				arguments(0, 6, 1, 1)
+		);
+	}
+
 	@BeforeEach
 	void setupTest() {
 		isMorningHour = false;
@@ -70,16 +80,6 @@ class ShipTimeSkipComponentTest {
 
 		assertEquals(timeService.getDay(), expectedDay);
 		verify(mockTimeSource, times(1)).setTimeScale(1f);
-	}
-
-	private static Stream<Arguments> updatesTimeWhenUnlockedParams() {
-		return Stream.of(
-				// (initialDay, initialHour, initialMinute, expectedDay)
-				arguments(0, 5, 0, 0),
-				arguments(0, 5, 59, 0),
-				arguments(0, 6, 0, 1),
-				arguments(0, 6, 1, 1)
-		);
 	}
 
 	@Test

@@ -1,42 +1,36 @@
 package com.csse3200.game.components;
 
+import box2dLight.ConeLight;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Json;
 import com.csse3200.game.services.ServiceLocator;
 
-import box2dLight.ConeLight;
-
 public class ConeLightComponent extends Component {
-
-	/**
-	 * Cone light from box2dlights that gets rendered by the ray handler
-	 */
-	private final ConeLight light;
-
-	/**
-	 * State of the light (on/off)
-	 */
-	private boolean active;
 
 	/**
 	 * Default light distance used if nothing is provided in the constructor
 	 */
 	private static final float DEFAULT_DISTANCE = 8f;
-
 	/**
 	 * Default light colour if nothing is provided in the constructor
 	 */
 	private static final Color DEFAULT_COLOR = Color.LIGHT_GRAY;
-
 	/**
 	 * Default size of the light cone in degrees
 	 */
 	private static final float DEFAULT_CONE_DEGREE = 30f;
-
 	/**
 	 * Default direction that the cone light is pointing in. Value of 0 is right, degrees goes anticlockwise
 	 */
 	private static final float DEFAULT_DIRECTION_DEGREE = 0f;
+	/**
+	 * Cone light from box2dlights that gets rendered by the ray handler
+	 */
+	private final ConeLight light;
+	/**
+	 * State of the light (on/off)
+	 */
+	private boolean active;
 
 
 	/**
@@ -161,6 +155,7 @@ public class ConeLightComponent extends Component {
 
 	/**
 	 * Changes the cone degree of the light
+	 *
 	 * @param coneDegree cone degree of the light
 	 */
 	public void setConeDegree(float coneDegree) {
@@ -187,7 +182,7 @@ public class ConeLightComponent extends Component {
 	 * Writes to the json in order to store the lights state
 	 */
 	@Override
-	public void write(Json json){
+	public void write(Json json) {
 		json.writeObjectStart(this.getClass().getSimpleName());
 		//Save the muted value to the json file
 		json.writeValue("isActive", active);

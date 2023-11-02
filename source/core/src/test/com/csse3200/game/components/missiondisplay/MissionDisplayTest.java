@@ -47,16 +47,12 @@ class MissionDisplayTest {
 	Quest completedQuest;
 	Quest expiredQuest;
 
-
-	static class TestReward extends Reward {
-		public TestReward() {
-			super();
-		}
-
-		@Override
-		public void collect() {
-			setCollected();
-		}
+	private static Stream<Arguments> clickingButtonGeneratesCorrectMenuParams() {
+		return Stream.of(
+				// (menuName, menuButtonIndex)
+				arguments("Incomplete Achievements", 0),
+				arguments("Active Quests", 1)
+		);
 	}
 
 	@BeforeEach
@@ -167,14 +163,6 @@ class MissionDisplayTest {
 		button.toggle();
 
 		assertTrue(((Window) actor).getTitleLabel().textEquals("Mission Giver"));
-	}
-
-	private static Stream<Arguments> clickingButtonGeneratesCorrectMenuParams() {
-		return Stream.of(
-				// (menuName, menuButtonIndex)
-				arguments("Incomplete Achievements", 0),
-				arguments("Active Quests", 1)
-		);
 	}
 
 	@Test
@@ -446,5 +434,16 @@ class MissionDisplayTest {
 		button.toggle();
 
 		assertTrue(((Window) actor).getTitleLabel().textEquals("Incomplete Achievements"));
+	}
+
+	static class TestReward extends Reward {
+		public TestReward() {
+			super();
+		}
+
+		@Override
+		public void collect() {
+			setCollected();
+		}
 	}
 }

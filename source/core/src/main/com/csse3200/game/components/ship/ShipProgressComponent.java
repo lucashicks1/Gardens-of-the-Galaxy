@@ -23,21 +23,6 @@ public class ShipProgressComponent extends Component {
 	private Set<Feature> unlockedFeatures;
 
 	/**
-	 * Ship features that can be unlocked along by repairing the ship.
-	 */
-	public enum Feature {
-		LIGHT(2),
-		BED(6),
-		TELEPORT(10);
-
-		public final int unlockLevel;
-
-		Feature(int unlockLevel) {
-			this.unlockLevel = unlockLevel;
-		}
-	}
-
-	/**
 	 * This component will handle the Ship's internal state of repair. It will listen for addPart events on the Ship
 	 * Entity, which will pass the number of Ship Part Items the player is using on the ship, and increment its
 	 * internal state of repair by that amount. It will also trigger a progressUpdated event on the Ship Entity along
@@ -150,6 +135,21 @@ public class ShipProgressComponent extends Component {
 		this.progress = jsonMap.getInt("level");
 		for (JsonValue val : jsonMap.get("features")) {
 			this.unlockedFeatures.add(Feature.valueOf(val.asString()));
+		}
+	}
+
+	/**
+	 * Ship features that can be unlocked along by repairing the ship.
+	 */
+	public enum Feature {
+		LIGHT(2),
+		BED(6),
+		TELEPORT(10);
+
+		public final int unlockLevel;
+
+		Feature(int unlockLevel) {
+			this.unlockLevel = unlockLevel;
 		}
 	}
 }

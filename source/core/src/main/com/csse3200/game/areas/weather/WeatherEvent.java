@@ -10,27 +10,23 @@ import com.csse3200.game.services.ServiceLocator;
 public abstract class WeatherEvent {
 
 	/**
-	 * Number of in-game hours until the {@link WeatherEvent} is able to be triggered and affects the in-game climate
-	 */
-	protected int numHoursUntil;
-
-	/**
-	 * Number of in-game hours that the {@link WeatherEvent} can be active for
-	 */
-	protected int duration;
-
-	/**
 	 * The priority of the {@link WeatherEvent} so that some weather can override others if they are important
 	 */
 	protected final int priority;
-
 	/**
 	 * The severity of the {@link WeatherEvent} which can affect the climate modifiers depending on the implementation
 	 * of the {@link WeatherEvent}. This ranges from 1.0 to 1.5
 	 */
 	protected final float severity;
-
 	protected final EventHandler climateControllerEvents;
+	/**
+	 * Number of in-game hours until the {@link WeatherEvent} is able to be triggered and affects the in-game climate
+	 */
+	protected int numHoursUntil;
+	/**
+	 * Number of in-game hours that the {@link WeatherEvent} can be active for
+	 */
+	protected int duration;
 
 	/**
 	 * Constructs an {@link WeatherEvent} with a given duration, priority and countdown

@@ -1,11 +1,10 @@
 package com.csse3200.game.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.csse3200.game.entities.Entity;
 import com.csse3200.game.entities.EntityType;
 import com.csse3200.game.events.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlanetOxygenService implements OxygenLevel {
 
@@ -13,11 +12,10 @@ public class PlanetOxygenService implements OxygenLevel {
 	private static final float DEFAULT_OXYGEN_GOAL = 10000;
 	private static final float DEFAULT_INITIAL_OXYGEN = 1000;
 	private static final String OXYGEN_UPDATE = "oxygenUpdate";
-
+	private final EventHandler eventHandler;
 	private float oxygenGoal;
 	private float oxygenPresent;
 	private float delta;
-	private final EventHandler eventHandler;
 
 	public PlanetOxygenService() {
 		logger.debug("Setting oxygen goal to {}", DEFAULT_OXYGEN_GOAL);
@@ -65,6 +63,15 @@ public class PlanetOxygenService implements OxygenLevel {
 	}
 
 	/**
+	 * Gets the maximum/goal amount of oxygen to be present on the planet.
+	 *
+	 * @return kilograms of oxygen
+	 */
+	public float getOxygenGoal() {
+		return oxygenGoal;
+	}
+
+	/**
 	 * Set the maximum/goal amount of oxygen to be present on the planet
 	 *
 	 * @param kilograms the number of kilograms the goal is set to.
@@ -76,15 +83,6 @@ public class PlanetOxygenService implements OxygenLevel {
 			logger.debug("Setting oxygen goal to {}", kilograms);
 			oxygenGoal = kilograms;
 		}
-	}
-
-	/**
-	 * Gets the maximum/goal amount of oxygen to be present on the planet.
-	 *
-	 * @return kilograms of oxygen
-	 */
-	public float getOxygenGoal() {
-		return oxygenGoal;
 	}
 
 	/**

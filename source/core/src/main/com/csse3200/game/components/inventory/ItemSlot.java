@@ -13,17 +13,16 @@ import com.csse3200.game.services.ServiceLocator;
  * A class used to combine all the data necessary to the individual inventory slots
  */
 public class ItemSlot extends Stack {
+	static int i;
+	private final Skin skin = ServiceLocator.getResourceService().getAsset("gardens-of-the-galaxy/gardens-of-the-galaxy.json", Skin.class);
 	private Texture itemTexture;
 	private Integer count;
-	private final Skin skin = ServiceLocator.getResourceService().getAsset("gardens-of-the-galaxy/gardens-of-the-galaxy.json", Skin.class);
 	private Image background;
 	private boolean selected;
 	private Image itemImage;
-
 	private Label label;
 	private Stack draggable;
 	private ItemFrame itemFrame;
-	static int i;
 
 
 	/**
@@ -67,6 +66,18 @@ public class ItemSlot extends Stack {
 	}
 
 	/**
+	 * Get the item count
+	 *
+	 * @return count integer of number of item
+	 */
+	public Integer getCount() {
+		if (count != null) {
+			return count;
+		}
+		return -1;
+	}
+
+	/**
 	 * Set the item count
 	 *
 	 * @param count integer of number of item
@@ -88,18 +99,6 @@ public class ItemSlot extends Stack {
 				this.label = null;
 			}
 		}
-	}
-
-	/**
-	 * Get the item count
-	 *
-	 * @return count integer of number of item
-	 */
-	public Integer getCount() {
-		if (count != null) {
-			return count;
-		}
-		return -1;
 	}
 
 	/**
@@ -163,6 +162,16 @@ public class ItemSlot extends Stack {
 		return itemImage;
 	}
 
+	public void setItemImage(Image image) {
+		if (draggable.hasChildren()) {
+			draggable.removeActorAt(0, true);
+		}
+		if (image != null) {
+			draggable.addActorAt(0, image);
+			this.itemImage = image;
+		}
+	}
+
 	public Stack getDraggable() {
 		return draggable;
 	}
@@ -173,22 +182,11 @@ public class ItemSlot extends Stack {
 		if (stack != null) {
 			if (stack.getChildren().size == 2) {
 				label = (Label) (stack.getChild(1));
-			}
-			else {
+			} else {
 				label = null;
 			}
 			this.draggable = stack;
 			this.add(stack);
-		}
-	}
-
-	public void setItemImage(Image image) {
-		if (draggable.hasChildren()) {
-		draggable.removeActorAt(0,true);
-		}
-		if (image != null) {
-			draggable.addActorAt(0, image);
-			this.itemImage = image;
 		}
 	}
 

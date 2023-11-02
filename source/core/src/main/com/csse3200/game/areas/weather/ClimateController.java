@@ -16,11 +16,6 @@ public class ClimateController implements Json.Serializable {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(ClimateController.class);
-
-	/**
-	 * The weather event that is currently occurring in the game
-	 */
-	private WeatherEvent currentWeatherEvent;
 	/**
 	 * List of all weather events that are either occurring or about to occur
 	 */
@@ -29,7 +24,10 @@ public class ClimateController implements Json.Serializable {
 	 * Event handler that other entities can use to trigger weather-based events
 	 */
 	private final EventHandler events;
-
+	/**
+	 * The weather event that is currently occurring in the game
+	 */
+	private WeatherEvent currentWeatherEvent;
 	/**
 	 * The time specifying when the current lighting effect should stop
 	 */
@@ -259,10 +257,14 @@ public class ClimateController implements Json.Serializable {
 				}
 
 				switch (name) {
-					case ("AcidShowerEvent") -> addWeatherEvent(new AcidShowerEvent(hoursUntil, duration, priority, severity));
-					case ("RainStormEvent") -> addWeatherEvent(new RainStormEvent(hoursUntil, duration, priority, severity));
-					case ("BlizzardEvent") -> addWeatherEvent(new BlizzardEvent(hoursUntil, duration, priority, severity));
-					case ("SolarSurgeEvent") -> addWeatherEvent(new SolarSurgeEvent(hoursUntil, duration, priority, severity));
+					case ("AcidShowerEvent") ->
+							addWeatherEvent(new AcidShowerEvent(hoursUntil, duration, priority, severity));
+					case ("RainStormEvent") ->
+							addWeatherEvent(new RainStormEvent(hoursUntil, duration, priority, severity));
+					case ("BlizzardEvent") ->
+							addWeatherEvent(new BlizzardEvent(hoursUntil, duration, priority, severity));
+					case ("SolarSurgeEvent") ->
+							addWeatherEvent(new SolarSurgeEvent(hoursUntil, duration, priority, severity));
 					default -> logger.error("Invalid weather event type while loading");
 				}
 			});

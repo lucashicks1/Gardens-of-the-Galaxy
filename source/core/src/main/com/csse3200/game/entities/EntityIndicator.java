@@ -18,6 +18,10 @@ import com.csse3200.game.ui.UIComponent;
 public class EntityIndicator extends UIComponent {
 
 	/**
+	 * Distance from center
+	 */
+	private static final float INDICATOR_DISTANCE = 175;
+	/**
 	 * Indicator image
 	 */
 	private Image indicator;
@@ -25,21 +29,14 @@ public class EntityIndicator extends UIComponent {
 	 * Indicator asset path
 	 */
 	private String indicatorAssetPath;
-
 	/**
 	 * The hostile entity being tracked
 	 */
 	private Entity entityToTractor;
-
 	/**
 	 * The camera component of the game
 	 */
 	private CameraComponent cameraComponent;
-
-	/**
-	 * Distance from center
-	 */
-	private static final float INDICATOR_DISTANCE = 175;
 
 	/**
 	 * Initialise a new indicator for the given entity

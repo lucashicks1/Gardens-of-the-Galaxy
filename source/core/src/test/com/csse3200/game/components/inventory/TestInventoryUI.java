@@ -52,29 +52,26 @@ import static org.mockito.Mockito.*;
  * the properties stores in 'PlayerConfig'.
  */
 @ExtendWith(GameExtension.class)
-
 class TestInventoryUI {
-	Entity player;
-	InventoryDisplay inventoryDisplay;
-	static InventoryComponent inventory;
-	Stage stage;
-	InventoryDisplayManager inventoryDisplayManager;
-	ArgumentCaptor<Window> windowArgument;
-	MockedConstruction<ItemFrame> mockFrame;
 	//TestGameArea to register so GameMap can be accessed through the ServiceLocator
 	private static final TestGameArea gameArea = new TestGameArea();
 	private static final Logger logger = LoggerFactory.getLogger(TestInventoryUI.class);
-
+	static InventoryComponent inventory;
 	static String[] texturePaths = {
 			"images/tool_shovel.png",
 			"images/tool_hoe.png",
 			"images/tool_scythe.png",
 			"images/bin.png"
 	};
-
 	static String[] skinPaths = {
 			"gardens-of-the-galaxy/gardens-of-the-galaxy.json"
 	};
+	Entity player;
+	InventoryDisplay inventoryDisplay;
+	Stage stage;
+	InventoryDisplayManager inventoryDisplayManager;
+	ArgumentCaptor<Window> windowArgument;
+	MockedConstruction<ItemFrame> mockFrame;
 
 	@BeforeAll
 	static void Create() {
@@ -83,6 +80,18 @@ class TestInventoryUI {
 		// Necessary for the playerActions component
 		GameMap gameMap = mock(GameMap.class);
 		gameArea.setGameMap(gameMap);
+	}
+
+	private static Stream<Arguments> addingItemsShouldAddInventoryImagesParams() {
+		ServiceLocator.registerResourceService(new ResourceService());
+		ServiceLocator.getResourceService().loadTextures(texturePaths);
+		ServiceLocator.getResourceService().loadAll();
+		return Stream.of(
+				arguments(new ItemComponent("Hoe", ItemType.HOE, "images/tool_hoe.png"), 0),
+				arguments(new ItemComponent("Scythe", ItemType.SCYTHE, "images/tool_scythe.png"), 1),
+				arguments(new ItemComponent("Shovel", ItemType.SHOVEL, "images/tool_shovel.png"), 2),
+				arguments(new ItemComponent("Item", ItemType.FERTILISER, "images/tool_shovel.png"), 3)
+		);
 	}
 
 	/**
@@ -124,6 +133,7 @@ class TestInventoryUI {
 						.addComponent(inventoryDisplay)
 						.addComponent(inventory);
 	}
+
 	@Test
 	void testToggleInventory() {
 		player.create();
@@ -167,7 +177,7 @@ class TestInventoryUI {
 		for (Cell<?> slot : cells) {
 			if (i < 10) {
 				i++;
-				assert ((Label) slot.getActor()).getText().replace(" ","").toString().equals(Integer.toString(i % 10));
+				assert ((Label) slot.getActor()).getText().replace(" ", "").toString().equals(Integer.toString(i % 10));
 				continue;
 			}
 			assert ((ItemSlot) slot.getActor()).getChild(0) instanceof ItemFrame;
@@ -178,18 +188,6 @@ class TestInventoryUI {
 				assert ((Stack) ((ItemSlot) slot.getActor()).getChild(1)).getChildren().isEmpty();
 			}
 		}
-	}
-
-	private static Stream<Arguments> addingItemsShouldAddInventoryImagesParams() {
-		ServiceLocator.registerResourceService(new ResourceService());
-		ServiceLocator.getResourceService().loadTextures(texturePaths);
-		ServiceLocator.getResourceService().loadAll();
-		return Stream.of(
-				arguments(new ItemComponent("Hoe", ItemType.HOE, "images/tool_hoe.png"), 0),
-				arguments(new ItemComponent("Scythe", ItemType.SCYTHE, "images/tool_scythe.png"), 1),
-				arguments(new ItemComponent("Shovel", ItemType.SHOVEL, "images/tool_shovel.png"), 2),
-				arguments(new ItemComponent("Item", ItemType.FERTILISER, "images/tool_shovel.png"), 3)
-		);
 	}
 
 	@AfterEach

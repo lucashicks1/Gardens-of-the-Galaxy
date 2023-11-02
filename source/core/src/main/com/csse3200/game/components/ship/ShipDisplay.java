@@ -18,16 +18,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 
 public class ShipDisplay extends UIComponent {
-	private Window window;
-	private boolean isOpen;
 	private static final Logger logger = LoggerFactory.getLogger(ShipDisplay.class);
-
-	private boolean lightUnlocked = false;
-	private boolean sleepUnlocked = false;
-	private int repairsMade = 0;
 	private static final String TEXT_COLOUR = "black";
 	private static final String PIXEL_BODY = "pixel-body";
 	private static final String BACKGROUND_COLOUR = "small-grey";
+	private Window window;
+	private boolean isOpen;
+	private boolean lightUnlocked = false;
+	private boolean sleepUnlocked = false;
+	private int repairsMade = 0;
 
 	@Override
 	public void create() {

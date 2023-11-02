@@ -16,49 +16,16 @@ import java.util.List;
 public class MissionManager implements Json.Serializable {
 
 	/**
-	 * An enum storing all possible events that the {@link MissionManager}'s {@link EventHandler} should listen to and
-	 * trigger. To add a listener to the {@link MissionManager}, create a new {@link MissionEvent} enum value, and add
-	 * a listener for the {@link #name()} of the enum value.
+	 * An array of all in-game {@link Achievement}s
 	 */
-	public enum MissionEvent {
-		// Triggers when a mission is completed, a single String representing name of completed mission is provided as
-		// an argument
-		MISSION_COMPLETE,
-		// Triggers when a new quest has been added to the mission manager
-		NEW_QUEST,
-		// Triggers when a quest expires
-		QUEST_EXPIRED,
-		// Triggers when a story quest's reward is collected (to ensure that the player has read the required dialogue),
-		// a single String representing the name of the quest whose reward has been collected is provided as an argument
-		QUEST_REWARD_COLLECTED,
-		// Triggers when a crop is planted, a single String representing plant name is provided as an argument
-		PLANT_CROP,
-		// Triggers when a crop is fertilised
-		FERTILISE_CROP,
-		// Triggers when ship debris is cleared
-		DEBRIS_CLEARED,
-		// Triggers when a crop is harvested, a single String representing the plant name is provided as an argument
-		HARVEST_CROP,
-		// Triggers on successful water use
-		WATER_CROP,
-		// Triggers when an animal is tamed
-		ANIMAL_TAMED,
-		// Triggers when a reward is collected used for MissionCompleteQuests
-		REWARD_COMPLETE,
-		// Triggers when a CombatStatsController is defeated by having it's health reduced to 0, a EntityType enum value
-		// is provided representing the type of entity defeated is provided as an argument
-		COMBAT_ACTOR_DEFEATED,
-		// Triggers when an animal is eaten by a Space Snapper, a EntityType enum value is provided representing the
-		// type of entity eaten is provided as an argument
-		ANIMAL_EATEN,
-		// Triggers when a ship part is added to the Ship
-		SHIP_PART_ADDED,
-		//Triggers when an item is collected
-		ITEMS_COLLECTED,
-		// Triggers when a fish is caught (includes any item from fishing)
-		FISH,
-	}
-
+	private static final Achievement[] achievements = new Achievement[]{
+			new PlantCropsAchievement("Plant President", 50),
+			new PlantCropsAchievement("Crop Enjoyer", 200),
+			new PlantCropsAchievement("Gardener of the Galaxy", 800),
+			new CollectItemsAchievement("Collector", 10),
+			new CollectItemsAchievement("Item Hoarder", 20),
+			new CollectItemsAchievement("Average Tristan", 50)
+	};
 	/**
 	 * The {@link MissionManager}'s {@link EventHandler}. {@link Mission}s should add listeners to
 	 * this {@link EventHandler} to update their state, when said events are triggered by in-game
@@ -78,18 +45,6 @@ public class MissionManager implements Json.Serializable {
 	private final List<Quest> selectableQuests = new ArrayList<>();
 
 	/**
-	 * An array of all in-game {@link Achievement}s
-	 */
-	private static final Achievement[] achievements = new Achievement[]{
-			new PlantCropsAchievement("Plant President", 50),
-			new PlantCropsAchievement("Crop Enjoyer", 200),
-			new PlantCropsAchievement("Gardener of the Galaxy", 800),
-			new CollectItemsAchievement("Collector", 10),
-			new CollectItemsAchievement("Item Hoarder", 20),
-			new CollectItemsAchievement("Average Tristan", 50)
-	};
-
-	/**
 	 * Creates the mission manager, registered all game achievements and adds a listener for hourly updates
 	 */
 	public MissionManager() {
@@ -103,6 +58,7 @@ public class MissionManager implements Json.Serializable {
 	 * Accepts a quest by adding it to the list of active quests in the game.  Also registers this quest in the game.
 	 * If this {@link Quest} is in the {@link List} of selectable {@link Quest}s, then this method will also remove the
 	 * {@link Quest} from the {@link List} of selectable {@link Quest}s.
+	 *
 	 * @param quest The {@link Quest} to be added and registered
 	 */
 	public void acceptQuest(Quest quest) {
@@ -115,6 +71,7 @@ public class MissionManager implements Json.Serializable {
 	/**
 	 * Returns a {@link List} of currently active (tracked) {@link Quest}s. This includes all {@link Quest}s which have not
 	 * expired (that is, they have been accepted, and they have been completed or not yet expired).
+	 *
 	 * @return The {@link List} of active {@link Quest}s.
 	 */
 	public List<Quest> getActiveQuests() {
@@ -124,6 +81,7 @@ public class MissionManager implements Json.Serializable {
 	/**
 	 * Adds a {@link Quest} to the {@link List} of selectable {@link Quest}s. Selectable {@link Quest}s can be accepted
 	 * by the player through the in-game quest NPC.
+	 *
 	 * @param quest The {@link Quest} to add (this {@link Quest} should not have already been registered).
 	 */
 	public void addQuest(Quest quest) {
@@ -134,6 +92,7 @@ public class MissionManager implements Json.Serializable {
 	/**
 	 * Returns a {@link List} of selectable {@link Quest}s. These {@link Quest}s can be accepted in-game through
 	 * interaction with the quest NPC.
+	 *
 	 * @return The list of selectable {@link Quest}s.
 	 */
 	public List<Quest> getSelectableQuests() {
@@ -142,6 +101,7 @@ public class MissionManager implements Json.Serializable {
 
 	/**
 	 * Returns all in-game {@link Achievement}s.
+	 *
 	 * @return All in-game {@link Achievement}s.
 	 */
 	public Achievement[] getAchievements() {
@@ -151,8 +111,9 @@ public class MissionManager implements Json.Serializable {
 	/**
 	 * Returns the {@link MissionManager}'s {@link EventHandler}, which is responsible for triggering events which
 	 * update the state of {@link Mission}s
+	 *
 	 * @return The {@link EventHandler} of the {@link MissionManager}, from which events can be triggered to update the
-	 * 		   state of relevant {@link Mission}s.
+	 * state of relevant {@link Mission}s.
 	 */
 	public EventHandler getEvents() {
 		return events;
@@ -175,6 +136,7 @@ public class MissionManager implements Json.Serializable {
 
 	/**
 	 * Writes the {@link MissionManager} to a Json object for saving
+	 *
 	 * @param json Json object written to
 	 */
 	@Override
@@ -227,11 +189,56 @@ public class MissionManager implements Json.Serializable {
 
 	/**
 	 * Method for loading the {@link MissionManager} for the game
+	 *
 	 * @param json
 	 * @param jsonMap
 	 */
 	@Override
 	public void read(Json json, JsonValue jsonMap) {
 		ServiceLocator.getMissionManager().readReal(json, jsonMap);
+	}
+
+	/**
+	 * An enum storing all possible events that the {@link MissionManager}'s {@link EventHandler} should listen to and
+	 * trigger. To add a listener to the {@link MissionManager}, create a new {@link MissionEvent} enum value, and add
+	 * a listener for the {@link #name()} of the enum value.
+	 */
+	public enum MissionEvent {
+		// Triggers when a mission is completed, a single String representing name of completed mission is provided as
+		// an argument
+		MISSION_COMPLETE,
+		// Triggers when a new quest has been added to the mission manager
+		NEW_QUEST,
+		// Triggers when a quest expires
+		QUEST_EXPIRED,
+		// Triggers when a story quest's reward is collected (to ensure that the player has read the required dialogue),
+		// a single String representing the name of the quest whose reward has been collected is provided as an argument
+		QUEST_REWARD_COLLECTED,
+		// Triggers when a crop is planted, a single String representing plant name is provided as an argument
+		PLANT_CROP,
+		// Triggers when a crop is fertilised
+		FERTILISE_CROP,
+		// Triggers when ship debris is cleared
+		DEBRIS_CLEARED,
+		// Triggers when a crop is harvested, a single String representing the plant name is provided as an argument
+		HARVEST_CROP,
+		// Triggers on successful water use
+		WATER_CROP,
+		// Triggers when an animal is tamed
+		ANIMAL_TAMED,
+		// Triggers when a reward is collected used for MissionCompleteQuests
+		REWARD_COMPLETE,
+		// Triggers when a CombatStatsController is defeated by having it's health reduced to 0, a EntityType enum value
+		// is provided representing the type of entity defeated is provided as an argument
+		COMBAT_ACTOR_DEFEATED,
+		// Triggers when an animal is eaten by a Space Snapper, a EntityType enum value is provided representing the
+		// type of entity eaten is provided as an argument
+		ANIMAL_EATEN,
+		// Triggers when a ship part is added to the Ship
+		SHIP_PART_ADDED,
+		//Triggers when an item is collected
+		ITEMS_COLLECTED,
+		// Triggers when a fish is caught (includes any item from fishing)
+		FISH,
 	}
 }

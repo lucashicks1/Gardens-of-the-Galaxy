@@ -32,15 +32,9 @@ import java.util.Objects;
  * An ui component for displaying player stats, e.g. health.
  */
 public class InventoryDisplay extends UIComponent {
-	private InventoryComponent inventory;
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(InventoryDisplay.class);
 	private final Table table = new Table(skin);
-	private Window window;
 	private final ArrayList<ItemSlot> slots = new ArrayList<>();
-	private boolean isOpen = false;
-	private DragAndDrop dnd;
-	private ArrayList<Actor> actors;
-	private Map<Stack, ItemSlot> map;
-	private Map<ItemSlot, Integer> indexes;
 	private final Integer size;
 	private final Integer rowSize;
 	private final boolean toolbar;
@@ -49,12 +43,18 @@ public class InventoryDisplay extends UIComponent {
 	private final InventoryDisplayManager inventoryDisplayManager;
 	private final Map<Integer, TextTooltip> tooltips = new HashMap<>();
 	private final InstantTooltipManager instantTooltipManager = new InstantTooltipManager();
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(InventoryDisplay.class);
 	private final ArrayList<Label> labels = new ArrayList<>();
+	private InventoryComponent inventory;
+	private Window window;
+	private boolean isOpen = false;
+	private DragAndDrop dnd;
+	private ArrayList<Actor> actors;
+	private Map<Stack, ItemSlot> map;
+	private Map<ItemSlot, Integer> indexes;
 	private boolean isPause = false;
 	private boolean lastState = false;
 	private Image bin = null;
- 
+
 
 	/**
 	 * Constructor for class
@@ -80,15 +80,15 @@ public class InventoryDisplay extends UIComponent {
 		initialiseInventory();
 		entity.getEvents().addListener(openEvent, this::toggleOpen);
 		entity.getEvents().addListener(refreshEvent, this::refreshInventory);
-		entity.getEvents().addListener("hotkeySelection",this::updateSelected);
+		entity.getEvents().addListener("hotkeySelection", this::updateSelected);
 		entity.getEvents().addListener(PlayerActions.events.ESC_INPUT.name(), this::setPause);
 		entity.getEvents().addListener("hideUI", this::hide);
 		inventoryDisplayManager.addInventoryDisplay(this);
 	}
 
-	public void setPause(){
+	public void setPause() {
 		isPause = !isPause;
-		if (isPause){
+		if (isPause) {
 			lastState = isOpen;
 			isOpen = false;
 			window.setVisible(isOpen);
@@ -104,7 +104,7 @@ public class InventoryDisplay extends UIComponent {
 	 * @see Table for positioning options
 	 */
 	private void initialiseInventory() {
-		window = new Window("   " +entity.getType() + " Inventory", skin, "wooden");
+		window = new Window("   " + entity.getType() + " Inventory", skin, "wooden");
 
 		// create variables needed for drag and drop
 		dnd = new DragAndDrop();
@@ -238,7 +238,7 @@ public class InventoryDisplay extends UIComponent {
 							if (keycode == Input.Keys.I || keycode == Input.Keys.E) {
 								return true;
 							}
-							return super.keyDown(event,keycode);
+							return super.keyDown(event, keycode);
 						}
 					};
 					stage.addListener(listener[0]);
@@ -246,7 +246,7 @@ public class InventoryDisplay extends UIComponent {
 					payload.setDragActor(getActor());
 					stage.addActor(getActor());
 					dnd.setDragActorPosition(50, -getActor().getHeight() / 2);
-					ItemSlot slot = map.get( (Stack) getActor());
+					ItemSlot slot = map.get((Stack) getActor());
 					tooltip = tooltips.get(indexes.get(slot));
 					tooltip.hide();
 					slot.removeListener(tooltip);
@@ -257,11 +257,11 @@ public class InventoryDisplay extends UIComponent {
 				@Override
 				public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
 					if (target == null) {
-						ItemSlot itemSlot = map.get( (Stack) getActor());
+						ItemSlot itemSlot = map.get((Stack) getActor());
 						itemSlot.add(getActor());
 						if (tooltips.get(indexes.get(itemSlot)) == null) {
 							itemSlot.addListener(tooltip);
-							tooltips.put(indexes.get(itemSlot),tooltip);
+							tooltips.put(indexes.get(itemSlot), tooltip);
 						}
 					}
 					stage.removeListener(listener[0]);
@@ -308,6 +308,7 @@ public class InventoryDisplay extends UIComponent {
 						ItemSlot itemSlot = map.get((Stack) source.getActor());
 						return !InventoryComponent.getForbiddenItems().contains(inventory.getItemPlace().get(indexes.get(itemSlot)));
 					}
+
 					@Override
 					public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 						ItemSlot itemSlot = map.get((Stack) source.getActor());
@@ -344,19 +345,19 @@ public class InventoryDisplay extends UIComponent {
 
 	/**
 	 * Updates displayed number at top of inventory to represent what slot is selected
+	 *
 	 * @param slotNum number of slot updated
 	 */
 	public void updateSelected(int slotNum) {
 		for (int i = 0; i < labels.size(); i++) {
-            Label label = labels.get(i);
-            if(slotNum == i) {
-                label.setColor(new Color(0x76428aff));
-            }
-			else {
-                label.setColor(Color.BLACK);
-            }
-            labels.set(i, label);
-        }
+			Label label = labels.get(i);
+			if (slotNum == i) {
+				label.setColor(new Color(0x76428aff));
+			} else {
+				label.setColor(Color.BLACK);
+			}
+			labels.set(i, label);
+		}
 	}
 
 	/**
@@ -438,6 +439,7 @@ public class InventoryDisplay extends UIComponent {
 	public boolean isOpen() {
 		return isOpen;
 	}
+
 	public DragAndDrop getDnd() {
 		return dnd;
 	}
@@ -453,7 +455,7 @@ public class InventoryDisplay extends UIComponent {
 					int level = (int) item.getEntity().getComponent(WateringCanLevelComponent.class).getCurrentLevel();
 					tooltip = new TextTooltip(itemName + "\n\nCurrent level is " + level, instantTooltipManager, skin);
 				} else {
-					tooltip = new TextTooltip(itemName + "\n\n" + item.getItemDescription(), instantTooltipManager,skin);
+					tooltip = new TextTooltip(itemName + "\n\n" + item.getItemDescription(), instantTooltipManager, skin);
 				}
 				if (tooltips.get(i) != null) {
 					tooltips.get(i).hide();
@@ -463,8 +465,7 @@ public class InventoryDisplay extends UIComponent {
 				tooltip.setInstant(true);
 				slot.addListener(tooltip);
 				tooltips.put(i, tooltip);
-			}
-			else {
+			} else {
 				if (tooltips.get(i) != null) {
 					tooltips.get(i).hide();
 					slot.removeListener(tooltips.get(i));
